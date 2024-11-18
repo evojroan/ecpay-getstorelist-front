@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import {StoreCard} from './components/Component'
 
 function App() {
-  const formRef=useRef(null)
+  const [Loading, setLoading] = useState(false);
   const [StoreData,setStoreData]=useState({Data:"尚無資料"})
   const [Payload, setPayload] = useState({
     MerchantID: "2000132",
@@ -20,11 +21,12 @@ function App() {
   
 
   function SendParams() {
+    if(Loading==false){setLoading(true)}
     let params = { MerchantID: Payload.MerchantID, CvsType: Payload.CvsType };
     axios
       .post(CreateCMVURL, params)
       .then((response) => {
-     console.log(response.data)
+    //  console.log(response.data)
 setStoreData(response.data)
       })
       .catch((error) => {
@@ -32,11 +34,16 @@ setStoreData(response.data)
       });
   }
 
-
+  useEffect(() => {
+    if (StoreData.RtnCode === 1) {
+      setLoading(false);
+    }
+  }, [StoreData.RtnCode]);
 
   return (
     <>
-      <div className="input">
+    
+      <div className="input m-2">
         <h2>取得門市清單：技術文件</h2>
         <a href="https://developers.ecpay.com.tw/?p=47496" target="_blank">
           https://developers.ecpay.com.tw/?p=47496
@@ -85,8 +92,9 @@ setStoreData(response.data)
         </div>
         <h2>選擇便利商店</h2>
         <div className="selectCvsType">
-          <select
+          <select className="border-2 border-black m-2"
             onChange={(event) => {
+              setLoading(false);
               setPayload({ ...Payload, CvsType: event.target.value });
             }}
           >
@@ -99,16 +107,37 @@ setStoreData(response.data)
             })}
           </select>
         </div>
-        <button onClick={SendParams}>送出</button>
+        <button type="button" className="border-2 border-black bg-slate-200 rounded-lg p-2 m-2" onClick={SendParams}  disabled={Loading}>{Loading?"讀取中":"送出"}</button>
       </div>
      
-      <div className="StoreData">回傳如下：<br/>
-      <pre style={{ 
-        whiteSpace: "pre-wrap",
-        wordWrap: "break-word"
-      }}>
-        {JSON.stringify(StoreData, null, 2)}
-      </pre>
+      <div className="StoreData m-2">
+        <h3>回傳如下：</h3>
+        <pre style={{ 
+          whiteSpace: "pre-wrap",
+          wordWrap: "break-word"
+        }}>
+          {StoreData.RtnCode === 1 &&
+            StoreData.StoreList.flatMap((list) => 
+              list.StoreInfo.map((store,index) => (
+                <StoreCard  
+                  CvsType={(list.CvsType=="FAMI"?"全家":"")||(list.CvsType=="UNIMART"?"7-11 超商(常溫)":"")||(list.CvsType=="OKMART"?"OK 超商":"")||(list.CvsType=="HILIFE"?"萊爾富":"")||(list.CvsType=="UNIMARTFREEZE"?"7-11 超商(冷鏈)":"")}
+                  key={`${list.CvsType}${index}`}
+                  StoreId={store.StoreId}
+                  StoreName={store.StoreName}
+                  StoreAddr={store.StoreAddr}
+                  StorePhone={store.StorePhone}
+                />
+              ))
+            )
+          }
+
+
+
+   
+          {/* <div>
+            {JSON.stringify(StoreData, null, 2)}
+          </div> */}
+        </pre>
       </div>
     </>
   );
