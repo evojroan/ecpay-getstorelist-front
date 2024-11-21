@@ -21,7 +21,7 @@ function App() {
     { Num: 5, name: "7-ELEVEN超商(冷鏈)", value: "UNIMARTFREEZE" },
   ];
 
-  const CreateCMVURL = "http://localhost:3000/post";
+  const CreateCMVURL = "https://ecpay-getstorelist-back.vercel.app/post";
 
   function SendParams() {
     if (Loading == false) {
