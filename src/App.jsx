@@ -108,6 +108,7 @@ function App() {
             onChange={(event) => {
               setLoading(false);
               setStoreData("")
+              setSlctdCity("")
               setSlctdDistrict("")
               setPayload({ ...Payload, CvsType: event.target.value });
             }}
