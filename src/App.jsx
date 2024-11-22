@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { StoreCard, FilterMenu } from "./components/Component";
+import { StoreCard, FilterMenu, SearchButton } from "./components/Component";
 import DistrictList from "./DistrictList";
 
 function App() {
   const [Loading, setLoading] = useState(false);
-  const [StoreData, setStoreData] = useState({ Data: "尚無資料" });
+  const [StoreData, setStoreData] = useState("");
   const [SlctdCity, setSlctdCity] = useState("");
   const [SlctdDistrict, setSlctdDistrict] = useState("");
   const [Payload, setPayload] = useState({
@@ -56,7 +56,7 @@ function App() {
     <>
       <div className="input m-2">
         <h2>取得門市清單：技術文件</h2>
-        <a href="https://developers.ecpay.com.tw/?p=47496" target="_blank">
+        <a href="https://developers.ecpay.com.tw/?p=47496" target="_blank" className="hover:underline hover:font-bold">
           https://developers.ecpay.com.tw/?p=47496
         </a>
         <h2>選擇特店編號</h2>
@@ -107,6 +107,8 @@ function App() {
             className="border-2 border-black m-2"
             onChange={(event) => {
               setLoading(false);
+              setStoreData("")
+              setSlctdDistrict("")
               setPayload({ ...Payload, CvsType: event.target.value });
             }}
           >
@@ -119,17 +121,10 @@ function App() {
             })}
           </select>
         </div>
-        <button
-          type="button"
-          className="border-2 border-black bg-slate-200 rounded-lg p-2 m-2"
-          onClick={SendParams}
-          disabled={Loading}
-        >
-          {Loading ? "讀取中" : "送出"}
-        </button>
+       <SearchButton propLoading={Loading} propSendParams={SendParams}/>
       </div>
 
-      <div className="StoreData m-2">
+     {StoreData? <div className="StoreData m-2">
         <FilterMenu
           propDistrictList={DistrictList}
           propSlctdCity={SlctdCity}
@@ -169,7 +164,7 @@ function App() {
                 ))
             )}
         </pre>
-      </div>
+      </div>:""}
     </>
   );
 }
